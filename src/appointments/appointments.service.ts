@@ -8,6 +8,13 @@ import { Doctor } from 'src/doctors/entities/doctor.entity';
 import { APPOINTMENT_HOURS } from './constanst/appointment-hours.constant';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
+
+import {
+  WebpayPlus,
+  IntegrationApiKeys,
+  IntegrationCommerceCodes,
+} from 'transbank-sdk';
+import { PaymentsService } from 'src/payments/payments.service';
 @Injectable()
 export class AppointmentsService {
   constructor(
@@ -17,6 +24,8 @@ export class AppointmentsService {
     private readonly patientRepository: Repository<Patient>,
     @InjectRepository(Doctor)
     private readonly doctorRepository: Repository<Doctor>,
+    private readonly paymentsService: PaymentsService
+
   ) { }
 
   findAll() {
@@ -25,39 +34,38 @@ export class AppointmentsService {
     });
   }
 
-  async findByDoctorId(doctorId: number, paginationDto: PaginationDto ) {
-    console.log( 'nannanana',{doctorId});
+  async findByDoctorId(doctorId: number, paginationDto: PaginationDto) {
+    console.log('nannanana', { doctorId });
     // return this.appointmentRepository.find(doctorId);
     const { limit = 5, offset = 0 } = paginationDto;
-    console.log({limit, offset});
+    console.log({ limit, offset });
     const appointments = await this.appointmentRepository.find({
       take: limit,
       skip: offset,
       where: {
-        active:true,
-        doctor: { id: doctorId } },
+        active: true,
+        doctor: { id: doctorId }
+      },
     });
 
     return appointments
   }
 
-  async appointmentConfirmByDoctor( id: number) {
-    const appointment = await this.appointmentRepository.findOneBy({id})
-    console.log('appointmentConfirmByDoctor,',{id,appointment});
+  async appointmentConfirmByDoctor(id: number) {
+    const appointment = await this.appointmentRepository.findOneBy({ id })
+    console.log('appointmentConfirmByDoctor,', { id, appointment });
 
-    if(!appointment?.paid){
+    if (!appointment?.paid) {
       //Confirmar que no esté pagada: si realmente no está pagada -> ejecutar error.
       // Si esta pagada, actualizar pagado y confirmado a true. tambien avisar si ya se encuentra pagada
-      
+
       throw new BadRequestException(
         `No se puede conﬁrmar una cita que no ha sido pagada.`,
       );
     }
-
     //Confirmar hora - cambiar confirm : true
 
     // console.log(appointment);
-
     // if (!appointment) {
     //   throw new BadRequestException(
     //     `La cita no existe`,
@@ -65,9 +73,12 @@ export class AppointmentsService {
     // }
   }
 
-  async payment( id: number) {
-    console.log('payment,',{id});
-    const appointment = await this.appointmentRepository.findBy({id})
+  // Endpoint para crear pago y posteriormente confirmarlo
+  async payment(id: number) {
+    console.log('payment,', { id });
+
+
+    const appointment = await this.appointmentRepository.findOneBy({ id })
     console.log(appointment);
 
     if (!appointment) {
@@ -77,6 +88,13 @@ export class AppointmentsService {
     }
 
     //Proceso de pago
+    const resp = this.paymentsService.initTransaction(appointment)
+
+    //Crear transaccion
+
+    // Generar url a endpoint que retorne un template para realizar el pago
+    // Ese endpoint debe hacer que la respuesta del pago vaya a un endpoint que guarde que el pago se realizo o no
+
 
 
 
@@ -87,7 +105,7 @@ export class AppointmentsService {
 
 
 
-    return appointment
+    return resp
 
 
     // return await this.appointmentRepository.findOneBy({id});
@@ -99,7 +117,7 @@ export class AppointmentsService {
 
 
 
-  
+
   async create(data: CreateAppointmentDto) {
     const { doctor_id, appointment_date } = data;
     console.log('create', data);
@@ -110,17 +128,29 @@ export class AppointmentsService {
         appointment_date: new Date(appointment_date),
       },
     });
-    console.log({existingAppointment});
+    console.log({ existingAppointment });
     if (existingAppointment) {
       throw new BadRequestException(
         `El doctor ya tiene una cita agendada para ese horario`,
       );
     }
-    // return data
-    // // Crear la cita
+    // Crear la cita
     const appointment = this.appointmentRepository.create(data);
-    console.log({appointment});
-
+    
     return this.appointmentRepository.save(appointment);
   }
+
+
+
+  async findOne(id: number) {
+    return this.appointmentRepository.findOneBy({ id })
+  }
+
+  async findOneDetail(id: number) {
+    return await this.appointmentRepository.findOne({
+      where: { id },
+      relations: ['patient', 'doctor'], // Relacionamos la entidad Appointment con Patient y Doctor
+    });
+  }
+
 }

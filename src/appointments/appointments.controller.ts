@@ -16,7 +16,8 @@ export class AppointmentsController {
   appointmentConfirmByDoctor( @Param( 'id' ) id: number ) {
     return this.appointmentsService.appointmentConfirmByDoctor(id);
   }
-  @Post('payment/:id')
+
+  @Post('payment-init/:id')
   paymentAppointment( @Param( 'id' ) id: number ) {
     return this.appointmentsService.payment(id);
   }
@@ -30,7 +31,7 @@ export class AppointmentsController {
 
 
   @Post()
-  @UsePipes(AppointmentValidationPipe) // Usamos el pipe personalizado
+  @UsePipes(AppointmentValidationPipe)
   async create(@Body() createAppointmentDto: CreateAppointmentDto) {
     return this.appointmentsService.create(createAppointmentDto);
   }

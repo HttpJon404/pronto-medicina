@@ -25,6 +25,9 @@ import {
   
     @Column({ type: 'timestamp' })
     appointment_date: Date;
+
+    @Column({default:0})
+    amount:number
   
     @Column()
     reason: string;
