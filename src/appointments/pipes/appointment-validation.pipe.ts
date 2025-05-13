@@ -17,10 +17,7 @@ export class AppointmentValidationPipe implements PipeTransform {
     private readonly doctorRepository: Repository<Doctor>,
   ) { }
 
-  async transform(value: any) {
-    console.log('aloja',value);
-
-        
+  async transform(value: any) {        
     const { patient_id, doctor_id, appointment_date } = value;
 
     // Validar que el paciente exista
@@ -44,13 +41,10 @@ export class AppointmentValidationPipe implements PipeTransform {
     const minutes = date.getMinutes();
 
     if (minutes !== 0 && minutes !== APPOINTMENT_HOURS.BLOCK_MINUTES) {
-        console.log('ERRORRRR');
       throw new BadRequestException(
         `Las citas deben agendarse cada ${APPOINTMENT_HOURS.BLOCK_MINUTES} minutos (ej. 09:00, 09:30...)`,
       );
     }
-    console.log('asdas');
-
     const isMorning =
       hour >= APPOINTMENT_HOURS.MORNING.start && hour < APPOINTMENT_HOURS.MORNING.end;
 
@@ -62,8 +56,7 @@ export class AppointmentValidationPipe implements PipeTransform {
         `Las citas solo pueden agendarse entre ${APPOINTMENT_HOURS.MORNING.start}:00–${APPOINTMENT_HOURS.MORNING.end}:00 y ${APPOINTMENT_HOURS.AFTERNOON.start}:00–${APPOINTMENT_HOURS.AFTERNOON.end}:00`,
       );
     }
-    console.log('naniii');
-    return value; // El valor transformado ya está validado y listo
+    return value;
 
 
 

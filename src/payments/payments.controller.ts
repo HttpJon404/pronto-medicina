@@ -3,16 +3,12 @@ import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { Response } from 'express';
-import { AppointmentsService } from 'src/appointments/appointments.service';
 
 @Controller('payments')
 export class PaymentsController {
-  constructor(
-    private readonly paymentsService: PaymentsService,
-    // private readonly appointmentsService: AppointmentsService
+  constructor(private readonly paymentsService: PaymentsService) { }
 
-  ) { }
-
+  //Endpoint para crear pago transbank y retornar pasarela de pago web
   @Get('pay/:id')
   async getPaymentPage(
     @Param('id') id: number,
@@ -21,48 +17,33 @@ export class PaymentsController {
     try {
       // Obtener datos de la cita (simulado)
       const data = await this.paymentsService.pay(id)
-      // console.log({data});
+      console.log({ data });
       // Renderizar template con datos
       return res.render('pay', data)
-
     } catch (error) {
       // Renderizar template de error
-      return res.render('payment', {
-        appointment: { id },
-        amount: 0,
-        status: 'error',
-        paymentUrl: null
-      });
+      return res.render('paymentRes', {titulo:'Ha ocurrido un error, intente mas tarde'});
     }
   }
-
-
 
   @Post()
   create(@Body() createPaymentDto: CreatePaymentDto) {
     return this.paymentsService.create(createPaymentDto);
   }
 
-
-   @Get('return')
-  async handleWebpayReturn(@Body() body, @Query() query,  @Res() res: Response) {
-    console.log('return metghos', {body, query});
+  // aqui retorna transabank una vez se realiza el flujo de la pasarela de pago.
+  @Get('return')
+  async handleWebpayReturn(@Body() body, @Query() query, @Res() res: Response) {
     const token = query.token_ws;
-
     // Confirmar transacción con Transbank
     const result = await this.paymentsService.confirmTransaction(token);
-    console.log({result});
 
     if (result.status === 'AUTHORIZED') {
-      // Actualizar paid en appointment
-
-      //Cambiar status de transaccion
-
       // Mostrar vista de éxito
-      return res.render('payment', { result });
+      return res.render('paymentRes', { titulo: 'Pago de cita médica exitoso' });
     } else {
       // Mostrar vista de error
-      return res.render('failed', { result });
+      return res.render('paymentRes', { titulo: 'Pago de cita médica rechazado, intente mas tarde.' });
     }
   }
 

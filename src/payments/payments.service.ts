@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { IntegrationApiKeys, WebpayPlus } from 'transbank-sdk';
@@ -7,6 +7,7 @@ import { Payment } from './entities/payment.entity';
 import { Repository } from 'typeorm';
 import { Appointment } from 'src/appointments/entities/appointment.entity';
 import { AppointmentsService } from 'src/appointments/appointments.service';
+import { UpdateAppointmentDto } from 'src/appointments/dto/update-appointment.dto ';
 
 @Injectable()
 export class PaymentsService {
@@ -26,7 +27,6 @@ export class PaymentsService {
     const appointment = await this.appointmentsService.findOneDetail(id)
     const payment = await this.initTransaction(appointment)
     // const payment = await this.findByAppointmentId(id)
-    console.log('pay', 'id', id, { appointment, payment });
     return { appointment, payment }
   }
 
@@ -36,18 +36,40 @@ export class PaymentsService {
     const appointment = await this.appointmentsService.findOneDetail(id)
     const payment = await this.initTransaction(appointment)
     // const payment = await this.findByAppointmentId(id)
-    console.log('pay', 'id', id, { appointment, payment });
     return { appointment, payment }
   }
-async confirmTransaction(token: string) {
-    try {
-      console.log('confirmTransaction');
-      const result = await this.trbnk.commit(token);
-      console.log('confirmTransaction',{result});
-      // Aquí puedes guardar el resultado en tu DB si lo deseas
-      // Por ejemplo: actualizar el payment con status y paid_at
 
-      return result;
+  //Revisar estado de la transaccion y actualizar datos
+  async confirmTransaction(token: string) {
+    try {
+      const result = await this.trbnk.commit(token);
+
+      const payment = await this.paymentRepository.findOne({
+        where: { transbankToken: token },
+        relations: ['appointment']
+
+      })
+      if (!payment) {
+        throw new NotFoundException(`Pago no encontrado`);
+      }
+
+      //Actualiza estado de payment
+      const dataUpdate: UpdatePaymentDto = {
+        status: result.status
+      }
+
+      if (result.status === 'AUTHORIZED') {
+        //Agregar fecha de pago y paid:true
+        dataUpdate.paidAt = new Date()
+        const appointmentUpdate: UpdateAppointmentDto = {
+          paid: true
+        }
+        this.appointmentsService.update(payment.appointment.id, appointmentUpdate)
+      }
+      Object.assign(payment, dataUpdate);
+      this.paymentRepository.save(payment);
+
+      return payment;
     } catch (error) {
       console.error('Error confirmando transacción:', error);
       throw error;
@@ -55,8 +77,9 @@ async confirmTransaction(token: string) {
   }
 
 
+  // Inicia transaccion de transabank y guarda registro payment en la DB del proyecto
   async initTransaction(appointment: Appointment | any) {
-    console.log('iniciar proceso transbank', appointment);
+    console.log('iniciar proceso transbank');
     const buyOrder = Math.floor(Math.random() * 1000000).toString();
     const sessionId = Math.floor(Math.random() * 1000000).toString();
     const amount: number = appointment.amount
@@ -78,14 +101,6 @@ async confirmTransaction(token: string) {
     return this.paymentRepository.save(payment)
   }
 
-  create(createPaymentDto: CreatePaymentDto) {
-    return 'This action adds a new payment';
-  }
-
-  findAll() {
-    return `This action returns all payments`;
-  }
-
   async findOne(id: number) {
     return await this.paymentRepository.findOneBy({ id })
   }
@@ -100,6 +115,14 @@ async confirmTransaction(token: string) {
     })
   }
 
+  create(createPaymentDto: CreatePaymentDto) {
+    return 'This action adds a new payment';
+  }
+
+  findAll() {
+    return `This action returns all payments`;
+  }
+
   update(id: number, updatePaymentDto: UpdatePaymentDto) {
     return `This action updates a #${id} payment`;
   }
@@ -107,4 +130,5 @@ async confirmTransaction(token: string) {
   remove(id: number) {
     return `This action removes a #${id} payment`;
   }
+
 }

@@ -11,15 +11,10 @@ export class AppointmentsController {
   findAll() {
     return this.appointmentsService.findAll();
   }
-
+  
   @Post('confirm/:id')
   appointmentConfirmByDoctor( @Param( 'id' ) id: number ) {
     return this.appointmentsService.appointmentConfirmByDoctor(id);
-  }
-
-  @Post('payment-init/:id')
-  paymentAppointment( @Param( 'id' ) id: number ) {
-    return this.appointmentsService.payment(id);
   }
 
   @Get('/doctor/:doctorId')
@@ -29,11 +24,9 @@ export class AppointmentsController {
     return this.appointmentsService.findByDoctorId(doctorId, paginationDto)
   }
 
-
   @Post()
   @UsePipes(AppointmentValidationPipe)
   async create(@Body() createAppointmentDto: CreateAppointmentDto) {
     return this.appointmentsService.create(createAppointmentDto);
   }
-
 }
