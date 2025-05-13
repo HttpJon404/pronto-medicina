@@ -1,0 +1,16 @@
+[
+  {
+    "user_id": 101,
+    "rut": "12.345.678-9",
+    "name": "María Fernanda Pérez",
+    "specialty": "Cardiología",
+    "enabled": true
+  },
+  {
+    "user_id": 102,
+    "rut": "98.765.432-1",
+    "name": "Juan Carlos Ramírez",
+    "specialty": "Pediatría",
+    "enabled": true
+  }
+]

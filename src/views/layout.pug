@@ -1,0 +1,17 @@
+doctype html
+html(lang="es")
+head
+    title Pago de Cita | ProntoMedicina
+    link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css")    
+    link(rel="stylesheet", href="/styles/style.css" )
+
+body
+    .header
+        .container
+            .logo
+                i.fas.fa-heartbeat
+                | ProntoMedicina    
+    .container
+        block content    
+    .footer
+        p © #{new Date().getFullYear()} ProntoMedicina - Todos los derechos reservados

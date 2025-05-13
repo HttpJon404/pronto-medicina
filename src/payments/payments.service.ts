@@ -76,7 +76,6 @@ export class PaymentsService {
     }
   }
 
-
   // Inicia transaccion de transabank y guarda registro payment en la DB del proyecto
   async initTransaction(appointment: Appointment | any) {
     console.log('iniciar proceso transbank');
