@@ -8,6 +8,7 @@ import { PatientsModule } from './patients/patients.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { PaymentsModule } from './payments/payments.module';
 import { SeedModule } from './seed/seed.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -23,14 +24,13 @@ import { SeedModule } from './seed/seed.module';
       password:process.env.DB_PASSWORD,
       autoLoadEntities: true,
       synchronize:true
-
     }),
     DoctorsModule,
     PatientsModule,
     AppointmentsModule,
     PaymentsModule,
     SeedModule,
-
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
