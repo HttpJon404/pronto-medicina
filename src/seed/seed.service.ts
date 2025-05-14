@@ -6,8 +6,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Doctor } from 'src/doctors/entities/doctor.entity';
 
 import { initialData } from './data/initial-data';
-import { Patient } from 'src/patients/entities/patient.entity';
-import { Appointment } from 'src/appointments/entities/appointment.entity';
+import { Patient } from '../patients/entities/patient.entity';
+import { Appointment } from '../appointments/entities/appointment.entity';
 
 @Injectable()
 export class SeedService {

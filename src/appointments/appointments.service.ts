@@ -2,11 +2,11 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Appointment } from './entities/appointment.entity';
-import { Patient } from 'src/patients/entities/patient.entity';
+import { Patient } from '../patients/entities/patient.entity';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
-import { Doctor } from 'src/doctors/entities/doctor.entity';
-import { PaginationDto } from 'src/common/dtos/pagination.dto';
-import { PaymentsService } from 'src/payments/payments.service';
+import { Doctor } from '../doctors/entities/doctor.entity';
+import { PaginationDto } from '../common/dtos/pagination.dto';
+import { PaymentsService } from '../payments/payments.service';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto ';
 @Injectable()
 export class AppointmentsService {
@@ -20,6 +20,16 @@ export class AppointmentsService {
     private readonly paymentsService: PaymentsService
 
   ) { }
+
+
+  async create2(createAppointmentDto: CreateAppointmentDto): Promise<Appointment> {
+    const appointment = this.appointmentRepository.create(createAppointmentDto);
+    return this.appointmentRepository.save(appointment);
+  }
+
+  async findAll2(): Promise<Appointment[]> {
+    return this.appointmentRepository.find();
+  }
 
   findAll() {
     return this.appointmentRepository.find({
@@ -50,7 +60,7 @@ export class AppointmentsService {
         `No se puede conﬁrmar una cita que no ha sido pagada.`,
       );
     }
-    const updateAppoint:UpdateAppointmentDto ={
+    const updateAppoint: UpdateAppointmentDto = {
       confirmed: true
     }
 

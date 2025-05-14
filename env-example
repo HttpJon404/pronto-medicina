@@ -1,8 +1,12 @@
 DB_PASSWORD=postgres
-DB_NAME=prontoDB
-DB_HOST=localhost
-DB_PORT=5432
+DB_NAME=prontoDBTest
 DB_USERNAME=postgres
+
+#local
+# DB_PORT=5432
+# Docker
+DB_HOST=localhost
+DB_PORT=5436
 
 
 

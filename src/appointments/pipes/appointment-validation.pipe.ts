@@ -2,8 +2,8 @@ import { Injectable, PipeTransform, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Appointment } from '../entities/appointment.entity';
 import { Repository } from 'typeorm';
-import { Patient } from 'src/patients/entities/patient.entity';
-import { Doctor } from 'src/doctors/entities/doctor.entity';
+import { Patient } from '../../patients/entities/patient.entity';
+import { Doctor } from '../../doctors/entities/doctor.entity';
 import { APPOINTMENT_HOURS } from '../constanst/appointment-hours.constant';
 
 @Injectable()

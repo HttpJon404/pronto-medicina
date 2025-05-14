@@ -2,10 +2,10 @@ import { Controller, Post, Body, UsePipes, Get, Param, Query, UseGuards } from '
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { AppointmentValidationPipe } from './pipes/appointment-validation.pipe';
-import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { PaginationDto } from '../common/dtos/pagination.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from 'src/auth/roles.guard';
-import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 @Controller('appointments')
 export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
@@ -45,6 +45,4 @@ export class AppointmentsController {
   findOne(@Param('id') id: string) {
     return this.appointmentsService.findOneDetail(+id);
   }
-
-
 }

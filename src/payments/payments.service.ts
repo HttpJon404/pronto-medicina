@@ -5,8 +5,8 @@ import { IntegrationApiKeys, WebpayPlus } from 'transbank-sdk';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Payment } from './entities/payment.entity';
 import { Repository } from 'typeorm';
-import { Appointment } from 'src/appointments/entities/appointment.entity';
-import { AppointmentsService } from 'src/appointments/appointments.service';
+import { Appointment } from '../appointments/entities/appointment.entity';
+import { AppointmentsService } from '../appointments/appointments.service';
 import { UpdateAppointmentDto } from 'src/appointments/dto/update-appointment.dto ';
 
 @Injectable()
