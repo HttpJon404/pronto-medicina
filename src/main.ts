@@ -7,7 +7,7 @@ import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
+  app.setGlobalPrefix('api')
   // Configura Pug como motor de vistas
   app.setViewEngine('pug');
   app.setBaseViewsDir(join(__dirname, '..', '/src/views'));
